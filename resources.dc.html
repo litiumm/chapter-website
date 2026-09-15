@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #08101C; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Roboto Mono', monospace; }
+  h1, h2, h3 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; margin: 0; letter-spacing: -0.01em; }
+  a { color: #E9F1F5; text-decoration: none; }
+  a:hover { color: rgba(233,241,245,0.62); }
+  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(-1200px); } }
+
+  #site-header { transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease; border-bottom: 1px solid transparent; }
+  #site-header.is-scrolled { background: rgba(8,16,28,0.72); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); border-bottom-color: rgba(233,241,245,0.12); box-shadow: 0 16px 40px -26px rgba(0,0,0,0.7); }
+  .nav-link { position: relative; padding-bottom: 5px; }
+  .nav-link::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1px; background: var(--accent, oklch(0.68 0.15 245)); transition: right 0.35s cubic-bezier(0.22,1,0.36,1); }
+  .nav-link:hover::after { right: 0; }
+  .menu-toggle { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 34px; height: 34px; background: none; border: none; padding: 0; cursor: pointer; flex-shrink: 0; }
+  .menu-toggle span { display: block; width: 20px; height: 1px; background: #E9F1F5; transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease; }
+  .menu-toggle.is-open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .menu-toggle.is-open span:nth-child(2) { opacity: 0; }
+  .menu-toggle.is-open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  #mobile-menu { max-height: 0; overflow: hidden; border-top: 1px solid transparent; transition: max-height 0.45s cubic-bezier(0.22,1,0.36,1), border-color 0.45s ease; }
+  #mobile-menu.is-open { max-height: 420px; border-top-color: rgba(233,241,245,0.12); }
+  @media (max-width: 760px) {
+    #nav-links { display: none !important; }
+    .menu-toggle { display: flex; }
+  }
+</style>
+</helmet>
+<div style="font-family: 'Roboto Mono', monospace; color: #E9F1F5; background: #08101C; min-height: 100vh; overflow-x: hidden; --accent: {{ accent }};">
+
+  <header id="site-header" ref="{{ headerRef }}" style="position: fixed; top: 0; left: 0; right: 0; z-index: 40;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: 18px clamp(18px, 3.5vw, 52px); display: flex; align-items: center; gap: 24px;">
+      <a href="index.html" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 11px; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase;">
+        <img src="assets/logo.svg" width="50" height="50" alt="IEEE SPS Logo" style="flex-shrink: 0; filter: drop-shadow(0 0 10px rgba(233,241,245,0.25));">
+        <span style="font-size: 20.5px; font-family: 'Instrument Serif';">IEEE&nbsp;SPS</span>
+      </a>
+      <nav id="nav-links" style="display: flex; align-items: center; gap: clamp(12px, 1.6vw, 26px); font-size: 13.5px; letter-spacing: 0.14em; text-transform: uppercase; flex-wrap: wrap; justify-content: flex-end;">
+        <a class="nav-link" href="index.html#about">About</a>
+        <a class="nav-link" href="events.dc.html">Events</a>
+        <a class="nav-link" href="resources.dc.html" style="color: var(--accent, oklch(0.72 0.15 245));">Resources</a>
+        <a class="nav-link" href="team.dc.html">Team</a>
+      </nav>
+      <button ref="{{ menuBtnRef }}" class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <nav id="mobile-menu" ref="{{ mobileMenuRef }}" style="display: flex; flex-direction: column; padding: 0 clamp(18px, 3.5vw, 52px); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;">
+      <a href="index.html#about" style="padding: 16px 0; border-bottom: 1px solid rgba(233,241,245,0.1);">About</a>
+      <a href="events.dc.html" style="padding: 16px 0; border-bottom: 1px solid rgba(233,241,245,0.1);">Events</a>
+      <a href="resources.dc.html" style="padding: 16px 0; border-bottom: 1px solid rgba(233,241,245,0.1); color: var(--accent, oklch(0.72 0.15 245));">Resources</a>
+      <a href="team.dc.html" style="padding: 16px 0;">Team</a>
+    </nav>
+    <div ref="{{ progressRef }}" style="position: absolute; left: 0; bottom: -1px; height: 1px; width: 0%; background: var(--accent, oklch(0.68 0.15 245));"></div>
+  </header>
+
+  <section style="max-width: 1180px; margin: 0 auto; padding: clamp(128px, 20vh, 180px) clamp(20px, 4vw, 48px) clamp(40px, 6vh, 64px);">
+    <div style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Resources</div>
+    <h1 style="font-size: clamp(34px, 6vw, 64px); letter-spacing: -0.03em; line-height: 1.05; margin: 20px 0 0; max-width: 740px; text-wrap: pretty;">Workshop material, open to <span style="font-style: italic; color: #2FD39C;">everyone</span></h1>
+    <p style="font-size: clamp(15px, 1.5vw, 18px); font-weight: 300; line-height: 1.65; color: rgba(233,241,245,0.62); max-width: 520px; margin: 24px 0 0; text-wrap: pretty;">Slides, notebooks and reading lists from our sessions. No login needed — members also get IEEE Xplore access through the chapter.</p>
+  </section>
+
+  <section style="max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px) clamp(56px, 9vh, 100px);">
+    <div style="border-top: 1px solid rgba(233,241,245,0.16);">
+      <div style="padding: 36px 0 8px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent, oklch(0.72 0.15 245));">Track 01 · DSP foundations</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1px; background: rgba(233,241,245,0.16); border: 1px solid rgba(233,241,245,0.16); margin-top: 18px;">
+        <a href="https://jackschaedler.github.io/circles-sines-signals/" target="_blank" rel="noopener noreferrer" style="background: #08101C; padding: 24px 22px 28px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Interactive guide</div>
+          <div style="font-size: 17px; font-weight: 300; margin-top: 12px;">Seeing Circles, Sines &amp; Signals</div>
+          <div style="font-size: 12px; font-weight: 300; color: rgba(233,241,245,0.62); margin-top: 10px; line-height: 1.6;">Jack Schaedler's visual primer on sampling, aliasing and the DFT — no dense notation.</div>
+        </a>
+        <a href="https://scipy-cookbook.readthedocs.io/items/FIRFilter.html" target="_blank" rel="noopener noreferrer" style="background: #08101C; padding: 24px 22px 28px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Notebook · SciPy Cookbook</div>
+          <div style="font-size: 17px; font-weight: 300; margin-top: 12px;">FIR filter design in NumPy &amp; SciPy</div>
+          <div style="font-size: 12px; font-weight: 300; color: rgba(233,241,245,0.62); margin-top: 10px; line-height: 1.6;">Design and apply a low-pass FIR filter with scipy.signal, step by step.</div>
+        </a>
+        <a href="https://ocw.mit.edu/courses/res-6-008-digital-signal-processing-spring-2011/" target="_blank" rel="noopener noreferrer" style="background: #08101C; padding: 24px 22px 28px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Course · MIT OCW</div>
+          <div style="font-size: 17px; font-weight: 300; margin-top: 12px;">Digital Signal Processing</div>
+          <div style="font-size: 12px; font-weight: 300; color: rgba(233,241,245,0.62); margin-top: 10px; line-height: 1.6;">Full video lectures on filter design, the FFT, sampling and aliasing.</div>
+        </a>
+      </div>
+
+      <div style="padding: 48px 0 8px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #2FD39C;">Track 02 · ML for signals</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1px; background: rgba(233,241,245,0.16); border: 1px solid rgba(233,241,245,0.16); margin-top: 18px;">
+        <a href="https://github.com/musikalkemist/AudioSignalProcessingForML" target="_blank" rel="noopener noreferrer" style="background: #08101C; padding: 24px 22px 28px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Repo &amp; course</div>
+          <div style="font-size: 17px; font-weight: 300; margin-top: 12px;">Audio Signal Processing for ML</div>
+          <div style="font-size: 12px; font-weight: 300; color: rgba(233,241,245,0.62); margin-top: 10px; line-height: 1.6;">Code and slides from Valerio Velardo's free video series — spectrograms, MFCCs and more.</div>
+        </a>
+        <a href="https://physionet.org/about/database/" target="_blank" rel="noopener noreferrer" style="background: #08101C; padding: 24px 22px 28px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Datasets · PhysioNet</div>
+          <div style="font-size: 17px; font-weight: 300; margin-top: 12px;">Open biomedical signal databases</div>
+          <div style="font-size: 12px; font-weight: 300; color: rgba(233,241,245,0.62); margin-top: 10px; line-height: 1.6;">50+ free ECG, PPG and EEG databases — the same kind of data behind Heartz &amp; Waves.</div>
+        </a>
+        <a href="https://www.audiocontentanalysis.org/" target="_blank" rel="noopener noreferrer" style="background: #08101C; padding: 24px 22px 28px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Textbook companion</div>
+          <div style="font-size: 17px; font-weight: 300; margin-top: 12px;">Intro to Audio Content Analysis</div>
+          <div style="font-size: 12px; font-weight: 300; color: rgba(233,241,245,0.62); margin-top: 10px; line-height: 1.6;">Alexander Lerch's companion site — features, exercises and code for signal-to-ML pipelines.</div>
+        </a>
+      </div>
+
+      <div style="padding: 48px 0 8px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Track 03 · Lab &amp; hardware</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1px; background: rgba(233,241,245,0.16); border: 1px solid rgba(233,241,245,0.16); margin-top: 18px;">
+        <a href="https://wiki.st.com/stm32mcu/wiki/STM32StepByStep:Getting_started_with_STM32_:_STM32_step_by_step" target="_blank" rel="noopener noreferrer" style="background: #08101C; padding: 24px 22px 28px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Guide · ST official</div>
+          <div style="font-size: 17px; font-weight: 300; margin-top: 12px;">Getting started with STM32</div>
+          <div style="font-size: 12px; font-weight: 300; color: rgba(233,241,245,0.62); margin-top: 10px; line-height: 1.6;">The step-by-step path from toolchain setup to reading sensors over I2C/SPI.</div>
+        </a>
+        <a href="https://www.tek.com/en/documents/primer/xyzs-oscilloscopes-primer" target="_blank" rel="noopener noreferrer" style="background: #08101C; padding: 24px 22px 28px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Guide · Tektronix</div>
+          <div style="font-size: 17px; font-weight: 300; margin-top: 12px;">Oscilloscope basics</div>
+          <div style="font-size: 12px; font-weight: 300; color: rgba(233,241,245,0.62); margin-top: 10px; line-height: 1.6;">The XYZs primer — vertical/horizontal controls, triggering and taking your first measurement.</div>
+        </a>
+        <a href="https://www.rtl-sdr.com/rtl-sdr-quick-start-guide/" target="_blank" rel="noopener noreferrer" style="background: #08101C; padding: 24px 22px 28px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Quick-start · rtl-sdr.com</div>
+          <div style="font-size: 17px; font-weight: 300; margin-top: 12px;">RTL-SDR quick start guide</div>
+          <div style="font-size: 12px; font-weight: 300; color: rgba(233,241,245,0.62); margin-top: 10px; line-height: 1.6;">Get a $25 USB dongle receiving FM, AM and unencrypted radio in one sitting.</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background: #0F1A2B; color: rgba(233,241,245,0.55); border-top: 1px solid rgba(233,241,245,0.16); position: relative; overflow: hidden;">
+    <svg width="2400" height="120" viewBox="0 0 2400 120" fill="none" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 2400px; height: 120px; animation: drift 26s linear infinite; opacity: 0.3;">
+      <path d="M0,60 c37.5,-40 112.5,-40 150,0 c37.5,40 112.5,40 150,0 c37.5,-40 112.5,-40 150,0 c37.5,40 112.5,40 150,0 c37.5,-40 112.5,-40 150,0 c37.5,40 112.5,40 150,0 c37.5,-40 112.5,-40 150,0 c37.5,40 112.5,40 150,0 c37.5,-40 112.5,-40 150,0 c37.5,40 112.5,40 150,0 c37.5,-40 112.5,-40 150,0 c37.5,40 112.5,40 150,0 c37.5,-40 112.5,-40 150,0 c37.5,40 112.5,40 150,0 c37.5,-40 112.5,-40 150,0 c37.5,40 112.5,40 150,0" stroke="var(--accent, oklch(0.72 0.15 245))" stroke-width="1.25" fill="none"></path>
+    </svg>
+    <div style="position: relative; max-width: 1180px; margin: 0 auto; padding: 40px clamp(20px, 4vw, 48px); display: flex; gap: 24px; justify-content: space-between; flex-wrap: wrap; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">
+      <a href="index.html" style="color: #E9F1F5;" style-hover="color: var(--accent, oklch(0.72 0.15 245));">← Back to home</a>
+      <span>© 2026 IEEE SPS Student Chapter</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;oklch(0.68 0.15 245)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;oklch(0.68 0.15 245)&quot;,&quot;oklch(0.75 0.15 175)&quot;,&quot;oklch(0.78 0.16 155)&quot;,&quot;oklch(0.7 0.14 280)&quot;],&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.header = React.createRef();
+    this.menuBtn = React.createRef();
+    this.mobileMenu = React.createRef();
+    this.progress = React.createRef();
+    this.menuOpen = false;
+  }
+
+  componentDidMount() {
+    this.onScroll = () => {
+      const y = window.scrollY || 0;
+      const headerEl = this.header.current;
+      if (headerEl) headerEl.classList.toggle("is-scrolled", y > 12);
+      const progressEl = this.progress.current;
+      if (progressEl) {
+        const doc = document.documentElement;
+        const max = (doc.scrollHeight || 1) - (doc.clientHeight || 1);
+        const pct = max > 0 ? Math.min(1, y / max) * 100 : 0;
+        progressEl.style.width = pct + "%";
+      }
+    };
+    window.addEventListener("scroll", this.onScroll, { passive: true });
+    this.onScroll();
+
+    this.closeMenu = () => {
+      this.menuOpen = false;
+      if (this.menuBtn.current) {
+        this.menuBtn.current.classList.remove("is-open");
+        this.menuBtn.current.setAttribute("aria-expanded", "false");
+      }
+      if (this.mobileMenu.current) this.mobileMenu.current.classList.remove("is-open");
+    };
+    this.onMenuToggle = () => {
+      this.menuOpen = !this.menuOpen;
+      if (this.menuBtn.current) {
+        this.menuBtn.current.classList.toggle("is-open", this.menuOpen);
+        this.menuBtn.current.setAttribute("aria-expanded", String(this.menuOpen));
+      }
+      if (this.mobileMenu.current) this.mobileMenu.current.classList.toggle("is-open", this.menuOpen);
+    };
+    if (this.menuBtn.current) this.menuBtn.current.addEventListener("click", this.onMenuToggle);
+    if (this.mobileMenu.current) this.mobileMenu.current.addEventListener("click", e => { if (e.target.closest("a")) this.closeMenu(); });
+    this.onResize = () => { if (window.innerWidth > 760) this.closeMenu(); };
+    window.addEventListener("resize", this.onResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.onScroll);
+    window.removeEventListener("resize", this.onResize);
+    if (this.menuBtn.current) this.menuBtn.current.removeEventListener("click", this.onMenuToggle);
+  }
+
+  renderVals() {
+    return {
+      accent: this.props.accent ?? "oklch(0.68 0.15 245)",
+      headerRef: this.header,
+      menuBtnRef: this.menuBtn,
+      mobileMenuRef: this.mobileMenu,
+      progressRef: this.progress
+    };
+  }
+}
+</script>
+</body>
+</html>

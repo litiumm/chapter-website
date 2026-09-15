@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #08101C; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Roboto Mono', monospace; }
+  h1, h2, h3 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; margin: 0; }
+  a { color: #E9F1F5; text-decoration: none; }
+  a:hover { color: rgba(233,241,245,0.62); }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+  @media (max-width: 1180px) { #sidx { display: none !important; } }
+
+  #site-header { transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease; border-bottom: 1px solid transparent; }
+  #site-header.is-scrolled { background: rgba(8,16,28,0.72); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); border-bottom-color: rgba(233,241,245,0.12); box-shadow: 0 16px 40px -26px rgba(0,0,0,0.7); }
+  .nav-link { position: relative; padding-bottom: 5px; }
+  .nav-link::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1px; background: var(--accent, oklch(0.68 0.15 245)); transition: right 0.35s cubic-bezier(0.22,1,0.36,1); }
+  .nav-link:hover::after { right: 0; }
+  .menu-toggle { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 34px; height: 34px; background: none; border: none; padding: 0; cursor: pointer; flex-shrink: 0; }
+  .menu-toggle span { display: block; width: 20px; height: 1px; background: #E9F1F5; transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease; }
+  .menu-toggle.is-open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .menu-toggle.is-open span:nth-child(2) { opacity: 0; }
+  .menu-toggle.is-open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  #mobile-menu { max-height: 0; overflow: hidden; border-top: 1px solid transparent; transition: max-height 0.45s cubic-bezier(0.22,1,0.36,1), border-color 0.45s ease; }
+  #mobile-menu.is-open { max-height: 420px; border-top-color: rgba(233,241,245,0.12); }
+  @media (max-width: 760px) {
+    #nav-links { display: none !important; }
+    .menu-toggle { display: flex; }
+  }
+</style>
+</helmet>
+<div style="background: #08101C; color: #E9F1F5; min-height: 100vh; overflow-x: hidden; --accent: {{ accent }};">
+
+  <header id="site-header" ref="{{ headerRef }}" style="position: fixed; top: 0; left: 0; right: 0; z-index: 40;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: 18px clamp(18px, 3.5vw, 52px); display: flex; align-items: center; gap: 24px;">
+      <a href="#top" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 11px; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase;">
+        <img src="assets/logo.svg" width="50" height="50" alt="IEEE SPS Logo" style="flex-shrink: 0; filter: drop-shadow(0 0 10px rgba(233,241,245,0.25));">
+        <span style="font-size: 20.5px;font-family: 'Instrument Serif';">IEEE&nbsp;SPS</span>
+      </a>
+      <nav id="nav-links" style="display: flex; align-items: center; gap: clamp(12px, 1.6vw, 26px); font-size: 13.5px; letter-spacing: 0.14em; text-transform: uppercase; flex-wrap: wrap; justify-content: flex-end;">
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="events.dc.html">Events</a>
+        <a class="nav-link" href="resources.dc.html">Resources</a>
+        <a class="nav-link" href="team.dc.html">Team</a>
+      </nav>
+      <button ref="{{ menuBtnRef }}" class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <nav id="mobile-menu" ref="{{ mobileMenuRef }}" style="display: flex; flex-direction: column; padding: 0 clamp(18px, 3.5vw, 52px); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;">
+      <a href="#about" style="padding: 16px 0; border-bottom: 1px solid rgba(233,241,245,0.1);">About</a>
+      <a href="events.dc.html" style="padding: 16px 0; border-bottom: 1px solid rgba(233,241,245,0.1);">Events</a>
+      <a href="resources.dc.html" style="padding: 16px 0; border-bottom: 1px solid rgba(233,241,245,0.1);">Resources</a>
+      <a href="team.dc.html" style="padding: 16px 0; border-bottom: 1px solid rgba(233,241,245,0.1);">Team</a>
+    </nav>
+    <div ref="{{ progressRef }}" style="position: absolute; left: 0; bottom: -1px; height: 1px; width: 0%; background: var(--accent, oklch(0.68 0.15 245));"></div>
+  </header>
+
+
+
+  <section id="top" style="position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; padding: 0 0 clamp(28px, 5vh, 56px);">
+    <canvas ref="{{ waveRef }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;"></canvas>
+    <div style="position: relative; max-width: 1440px; width: 100%; margin: 0 auto; padding: 0 clamp(18px, 3.5vw, 52px);">
+      <div style="display: flex; align-items: baseline; gap: 14px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.62);">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent, oklch(0.68 0.15 245)); animation: blink 2s ease-in-out infinite;"></span>
+        Signal Processing Society · Student Chapter
+      </div>
+      <h1 style="font-size: clamp(58px, 15.5vw, 250px); line-height: 0.84; letter-spacing: -0.045em; margin: clamp(14px, 2.5vh, 28px) 0 0; text-wrap: balance;">Read the<br><span style="font-style: italic; color: #2FD39C;">signal</span>.</h1>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(20px, 4vw, 64px); align-items: end; margin-top: clamp(24px, 5vh, 56px); border-top: 1px solid rgba(233,241,245,0.16); padding-top: 22px;">
+        <p style="font-size: 14.5px; font-weight: 300; line-height: 1.75; color: rgba(233,241,245,0.62); margin: 0; max-width: 420px; text-wrap: pretty;">Audio, images, radio, biosignals. A student chapter that takes them apart — weekly sessions, open material, working projects.</p>
+        <div style="font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); line-height: 2;">VIT Vellore<br>Dept. of Electronics &amp; Communication</div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start;">
+          <a href="resources.dc.html" style="background: #2FD39C; color: #06131F; border-radius: 999px; padding: 14px 24px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;" style-hover="background: var(--accent, oklch(0.68 0.15 245));">Browse resources</a>
+          <a href="#join" style="border: 1px solid rgba(233,241,245,0.28); border-radius: 999px; padding: 14px 24px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(233,241,245,0.62);" style-hover="border-color: #E9F1F5; color: #E9F1F5;">Join</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="border-top: 1px solid rgba(233,241,245,0.16); border-bottom: 1px solid rgba(233,241,245,0.16); overflow: hidden; background: #0F1A2B; color: #E9F1F5;">
+    <div style="display: flex; width: max-content; animation: marquee 42s linear infinite; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; padding: 13px 0;">
+      <div style="display: flex; gap: 40px; padding-right: 40px;">
+        <span>Sampling</span><span style="color: #2FD39C;">✳</span><span>Fourier</span><span style="color: #2FD39C;">✳</span><span>Convolution</span><span style="color: #2FD39C;">✳</span><span>Wavelets</span><span style="color: #2FD39C;">✳</span><span>Beamforming</span><span style="color: #2FD39C;">✳</span><span>Spectrogram</span><span style="color: #2FD39C;">✳</span><span>Kalman</span><span style="color: #2FD39C;">✳</span><span>Aliasing</span><span style="color: #2FD39C;">✳</span>
+      </div>
+      <div style="display: flex; gap: 40px; padding-right: 40px;">
+        <span>Sampling</span><span style="color: #2FD39C;">✳</span><span>Fourier</span><span style="color: #2FD39C;">✳</span><span>Convolution</span><span style="color: #2FD39C;">✳</span><span>Wavelets</span><span style="color: #2FD39C;">✳</span><span>Beamforming</span><span style="color: #2FD39C;">✳</span><span>Spectrogram</span><span style="color: #2FD39C;">✳</span><span>Kalman</span><span style="color: #2FD39C;">✳</span><span>Aliasing</span><span style="color: #2FD39C;">✳</span>
+      </div>
+    </div>
+  </div>
+
+  <section id="about" style="max-width: 1440px; margin: 0 auto; padding: clamp(72px, 14vh, 170px) clamp(18px, 3.5vw, 52px);">
+    <div data-reveal="1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(28px, 6vw, 96px);">
+      <div style="font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">01 — About</div>
+      <div style="grid-column: span 2; min-width: 0;">
+        <h2 style="font-size: clamp(30px, 5.2vw, 82px); line-height: 1.02; letter-spacing: -0.035em; text-wrap: pretty;">A working group,<br>not a club.</h2>
+        <p style="font-size: 15px; font-weight: 300; line-height: 1.8; color: rgba(233,241,245,0.62); margin: 32px 0 0; max-width: 620px; text-wrap: pretty;">Members come from electronics, computer science and instrumentation. Every Friday we pick a paper apart; every term we ship something. Open sessions are free for the whole campus. Membership adds IEEE Xplore access, SPS travel grants and mentoring.</p>
+      </div>
+    </div>
+    <div data-reveal="1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(50%, 150px), 1fr)); gap: 1px; background: rgba(233,241,245,0.16); margin-top: clamp(40px, 8vh, 90px); border-top: 1px solid rgba(233,241,245,0.16); border-bottom: 1px solid rgba(233,241,245,0.16);">
+      <div style="background: #08101C; padding: 26px 20px;">
+        <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(38px, 5vw, 66px); line-height: 1; letter-spacing: -0.03em;">+100</div>
+        <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 10px;">Members</div>
+      </div>
+      <div style="background: #08101C; padding: 26px 20px;">
+        <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(38px, 5vw, 66px); line-height: 1; letter-spacing: -0.03em;">24</div>
+        <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 10px;">Events held</div>
+      </div>
+      <div style="background: #08101C; padding: 26px 20px;">
+        <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(38px, 5vw, 66px); line-height: 1; letter-spacing: -0.03em; color: var(--accent, oklch(0.68 0.15 245));">07</div>
+        <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 10px;">Papers out</div>
+      </div>
+      <div style="background: #08101C; padding: 26px 20px;">
+        <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(38px, 5vw, 66px); line-height: 1; letter-spacing: -0.03em;">03</div>
+        <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 10px;">Active projects</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="events" style="max-width: 1440px; margin: 0 auto; padding: clamp(56px, 10vh, 130px) clamp(18px, 3.5vw, 52px);">
+    <div data-reveal="1" style="display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap;">
+      <div style="display: flex; gap: clamp(18px, 5vw, 84px); align-items: baseline; flex-wrap: wrap;">
+        <div style="font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">02 — Featured event</div>
+        <h2 style="font-size: clamp(28px, 4.4vw, 64px); letter-spacing: -0.035em; line-height: 1.05;">Heartz &amp; Waves</h2>
+      </div>
+      <a href="events.dc.html" style="font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.62); border-bottom: 1px solid rgba(233,241,245,0.3); padding-bottom: 4px;" style-hover="color: #E9F1F5; border-color: #E9F1F5;">All events</a>
+    </div>
+
+    <div data-reveal="1" style="margin-top: clamp(32px, 6vh, 64px); border: 1px solid rgba(233,241,245,0.16); background: #0C1728;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1.3fr)) minmax(min(100%, 260px), 1fr); gap: 1px; background: rgba(233,241,245,0.16);">
+        <div style="background: #0C1728; padding: clamp(28px, 4vw, 48px);">
+          <div style="display: inline-flex; align-items: center; gap: 10px; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #2FD39C; border: 1px solid rgba(47,211,156,0.4); border-radius: 999px; padding: 7px 16px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #2FD39C; animation: blink 2s ease-in-out infinite;"></span>
+            Registrations open
+          </div>
+          <h3 style="font-size: clamp(34px, 4.5vw, 56px); letter-spacing: -0.03em; line-height: 1; margin-top: 22px;">Heartz &amp; <span style="font-style: italic; color: var(--accent, oklch(0.68 0.15 245));">Waves</span></h3>
+          <p style="font-size: 14.5px; font-weight: 300; line-height: 1.8; color: rgba(233,241,245,0.72); margin: 20px 0 0; max-width: 520px; text-wrap: pretty;">A 36-hour overnight hackathon where you build real biomedical embedded systems — from raw sensor signals to working prototypes.</p>
+          <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 26px; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(233,241,245,0.45);">
+            <span>36-hour overnight hackathon</span>
+            <span style="color: rgba(233,241,245,0.25);">·</span>
+            <span>Beginner-friendly</span>
+            <span style="color: rgba(233,241,245,0.25);">·</span>
+            <span>Limited spots</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: clamp(28px, 4vh, 40px);">
+            <a href="https://gravitas.vit.ac.in/events/617045eb-70a2-47cd-9778-d25b3f15eafa" target="_blank" rel="noopener noreferrer" style="background: #2FD39C; color: #06131F; border-radius: 999px; padding: 14px 26px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;" style-hover="background: var(--accent, oklch(0.68 0.15 245));">Register now →</a>
+            <span style="font-size: 11px; letter-spacing: 0.06em; color: rgba(233,241,245,0.45);">Limited spots — reserve yours before they're gone.</span>
+          </div>
+        </div>
+
+        <div style="background: #0C1728; padding: clamp(28px, 4vw, 48px); display: flex; flex-direction: column; justify-content: center;">
+          <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Hardware kit</div>
+          <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(46px, 6vw, 68px); line-height: 1; letter-spacing: -0.03em; margin-top: 12px; color: var(--accent, oklch(0.72 0.15 245));">₹1,600</div>
+          <p style="font-size: 13px; font-weight: 300; line-height: 1.75; color: rgba(233,241,245,0.62); margin: 12px 0 0;">Worth of kit — yours to keep. Includes STM32, AD8232, MAX30102 &amp; more.</p>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid rgba(233,241,245,0.16); padding: clamp(28px, 4vw, 48px);">
+        <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(233,241,245,0.45);">What's in store</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 14px 32px; margin-top: 22px;">
+          <div style="display: flex; gap: 12px; align-items: baseline; font-size: 13.5px; font-weight: 300; line-height: 1.6; color: rgba(233,241,245,0.72);"><span style="color: #2FD39C;">✓</span>Beginner-friendly — starts with a C workshop</div>
+          <div style="display: flex; gap: 12px; align-items: baseline; font-size: 13.5px; font-weight: 300; line-height: 1.6; color: rgba(233,241,245,0.72);"><span style="color: #2FD39C;">✓</span>Datasheet-level sensor interfacing</div>
+          <div style="display: flex; gap: 12px; align-items: baseline; font-size: 13.5px; font-weight: 300; line-height: 1.6; color: rgba(233,241,245,0.72);"><span style="color: #2FD39C;">✓</span>DSP: filtering, FFT &amp; wavelets — explained practically</div>
+          <div style="display: flex; gap: 12px; align-items: baseline; font-size: 13.5px; font-weight: 300; line-height: 1.6; color: rgba(233,241,245,0.72);"><span style="color: #2FD39C;">✓</span>Intro to Edge AI on embedded systems</div>
+          <div style="display: flex; gap: 12px; align-items: baseline; font-size: 13.5px; font-weight: 300; line-height: 1.6; color: rgba(233,241,245,0.72);"><span style="color: #2FD39C;">✓</span>Live signal visualization (Python &amp; Octave)</div>
+          <div style="display: flex; gap: 12px; align-items: baseline; font-size: 13.5px; font-weight: 300; line-height: 1.6; color: rgba(233,241,245,0.72);"><span style="color: #2FD39C;">✓</span>Guided mentorship, end to end</div>
+          <div style="display: flex; gap: 12px; align-items: baseline; font-size: 13.5px; font-weight: 300; line-height: 1.6; color: rgba(233,241,245,0.72);"><span style="color: #2FD39C;">✓</span>Walk away with a complete project + hardware</div>
+        </div>
+        <div style="font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: clamp(20px, 2.4vw, 28px); letter-spacing: -0.01em; color: rgba(233,241,245,0.85); margin-top: clamp(28px, 4vh, 40px);">Learn. Build. Connect.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" style="border-top: 1px solid rgba(233,241,245,0.16); background: #0C1728;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: clamp(64px, 12vh, 150px) clamp(18px, 3.5vw, 52px);">
+      <div data-reveal="1" style="display: flex; gap: clamp(18px, 5vw, 84px); align-items: baseline; flex-wrap: wrap;">
+        <div style="font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">03 — Projects</div>
+        <h2 style="font-size: clamp(28px, 4.4vw, 64px); letter-spacing: -0.035em; line-height: 1.05;">In the lab now</h2>
+      </div>
+      <div data-reveal="1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(18px, 2.5vw, 32px); margin-top: clamp(36px, 7vh, 72px);">
+        <div style="background: #08101C; border: 1px solid rgba(233,241,245,0.14);">
+          <div style="height: 120px; border-bottom: 1px solid rgba(233,241,245,0.14); overflow: hidden; display: flex; align-items: center;">
+            <svg width="640" height="120" viewBox="0 0 640 120" fill="none" style="display: block;">
+              <path d="M0,60 h50 l10,-34 l8,56 l7,-42 l11,20 h54 l10,-34 l8,56 l7,-42 l11,20 h54 l10,-34 l8,56 l7,-42 l11,20 h54 l10,-34 l8,56 l7,-42 l11,20 h220" stroke="var(--accent, oklch(0.68 0.15 245))" stroke-width="1.4" fill="none"></path>
+            </svg>
+          </div>
+          <div style="padding: 26px 24px 32px;">
+            <h3 style="font-size: 25px; letter-spacing: -0.02em;">Low-cost ECG denoiser</h3>
+            <p style="font-size: 13.5px; font-weight: 300; line-height: 1.75; color: rgba(233,241,245,0.62); margin: 12px 0 0;">Adaptive filtering on a microcontroller to clean single-lead ECG for a campus health screening pilot.</p>
+            <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 24px;">Biosignals · 4 members</div>
+          </div>
+        </div>
+        <div style="background: #08101C; border: 1px solid rgba(233,241,245,0.14);">
+          <div style="height: 120px; border-bottom: 1px solid rgba(233,241,245,0.14); display: flex; align-items: flex-end; gap: 4px; padding: 0 22px 20px;">
+            <div style="flex: 1; height: 26%; background: #2FD39C;"></div>
+            <div style="flex: 1; height: 58%; background: #2FD39C;"></div>
+            <div style="flex: 1; height: 40%; background: #2FD39C;"></div>
+            <div style="flex: 1; height: 74%; background: #2FD39C;"></div>
+            <div style="flex: 1; height: 33%; background: #2FD39C;"></div>
+            <div style="flex: 1; height: 52%; background: #2FD39C;"></div>
+            <div style="flex: 1; height: 22%; background: #2FD39C;"></div>
+            <div style="flex: 1; height: 64%; background: #2FD39C;"></div>
+            <div style="flex: 1; height: 38%; background: #2FD39C;"></div>
+            <div style="flex: 1; height: 46%; background: #2FD39C;"></div>
+          </div>
+          <div style="padding: 26px 24px 32px;">
+            <h3 style="font-size: 25px; letter-spacing: -0.02em;">Campus acoustic map</h3>
+            <p style="font-size: 13.5px; font-weight: 300; line-height: 1.75; color: rgba(233,241,245,0.62); margin: 12px 0 0;">Distributed sound-level logging to chart noise across the campus over a full academic term.</p>
+            <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 24px;">Audio · 6 members</div>
+          </div>
+        </div>
+        <div style="background: #08101C; border: 1px solid rgba(233,241,245,0.14);">
+          <div style="height: 120px; border-bottom: 1px solid rgba(233,241,245,0.14); display: grid; grid-template-columns: repeat(14, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1px; padding: 18px 22px;">
+            <div style="background: rgba(233,241,245,0.7);"></div><div style="background: rgba(233,241,245,0.18);"></div><div style="background: rgba(233,241,245,0.42);"></div><div style="background: rgba(233,241,245,0.1);"></div><div style="background: rgba(233,241,245,0.55);"></div><div style="background: rgba(233,241,245,0.26);"></div><div style="background: rgba(233,241,245,0.15);"></div><div style="background: rgba(233,241,245,0.6);"></div><div style="background: rgba(233,241,245,0.3);"></div><div style="background: rgba(233,241,245,0.2);"></div><div style="background: rgba(233,241,245,0.48);"></div><div style="background: rgba(233,241,245,0.12);"></div><div style="background: rgba(233,241,245,0.36);"></div><div style="background: rgba(233,241,245,0.24);"></div>
+            <div style="background: rgba(233,241,245,0.2);"></div><div style="background: rgba(233,241,245,0.5);"></div><div style="background: rgba(233,241,245,0.14);"></div><div style="background: rgba(233,241,245,0.38);"></div><div style="background: rgba(233,241,245,0.22);"></div><div style="background: rgba(233,241,245,0.64);"></div><div style="background: rgba(233,241,245,0.3);"></div><div style="background: rgba(233,241,245,0.16);"></div><div style="background: rgba(233,241,245,0.44);"></div><div style="background: rgba(233,241,245,0.26);"></div><div style="background: rgba(233,241,245,0.12);"></div><div style="background: rgba(233,241,245,0.52);"></div><div style="background: rgba(233,241,245,0.28);"></div><div style="background: rgba(233,241,245,0.18);"></div>
+            <div style="background: rgba(233,241,245,0.34);"></div><div style="background: rgba(233,241,245,0.12);"></div><div style="background: rgba(233,241,245,0.58);"></div><div style="background: rgba(233,241,245,0.24);"></div><div style="background: rgba(233,241,245,0.16);"></div><div style="background: rgba(233,241,245,0.4);"></div><div style="background: rgba(233,241,245,0.22);"></div><div style="background: rgba(233,241,245,0.46);"></div><div style="background: rgba(233,241,245,0.18);"></div><div style="background: rgba(233,241,245,0.32);"></div><div style="background: rgba(233,241,245,0.14);"></div><div style="background: rgba(233,241,245,0.56);"></div><div style="background: rgba(233,241,245,0.2);"></div><div style="background: rgba(233,241,245,0.38);"></div>
+            <div style="background: rgba(233,241,245,0.14);"></div><div style="background: rgba(233,241,245,0.28);"></div><div style="background: rgba(233,241,245,0.2);"></div><div style="background: rgba(233,241,245,0.5);"></div><div style="background: rgba(233,241,245,0.12);"></div><div style="background: rgba(233,241,245,0.34);"></div><div style="background: rgba(233,241,245,0.18);"></div><div style="background: rgba(233,241,245,0.26);"></div><div style="background: rgba(233,241,245,0.42);"></div><div style="background: rgba(233,241,245,0.16);"></div><div style="background: rgba(233,241,245,0.3);"></div><div style="background: rgba(233,241,245,0.22);"></div><div style="background: rgba(233,241,245,0.48);"></div><div style="background: rgba(233,241,245,0.12);"></div>
+          </div>
+          <div style="padding: 26px 24px 32px;">
+            <h3 style="font-size: 25px; letter-spacing: -0.02em;">Satellite image sharpening</h3>
+            <p style="font-size: 13.5px; font-weight: 300; line-height: 1.75; color: rgba(233,241,245,0.62); margin: 12px 0 0;">Comparing classical super-resolution against learned models on open Sentinel-2 tiles.</p>
+            <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 24px;">Imaging · 3 members</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="resources" style="border-top: 1px solid rgba(233,241,245,0.16); max-width: 1440px; margin: 0 auto; padding: clamp(64px, 12vh, 150px) clamp(18px, 3.5vw, 52px);">
+    <div data-reveal="1" style="display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap;">
+      <div style="display: flex; gap: clamp(18px, 5vw, 84px); align-items: baseline; flex-wrap: wrap;">
+        <div style="font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">04 — Resources</div>
+        <h2 style="font-size: clamp(28px, 4.4vw, 64px); letter-spacing: -0.035em; line-height: 1.05;">Open material</h2>
+      </div>
+      <a href="resources.dc.html" style="font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.62); border-bottom: 1px solid rgba(233,241,245,0.3); padding-bottom: 4px;" style-hover="color: #E9F1F5; border-color: #E9F1F5;">All tracks</a>
+    </div>
+    <div data-reveal="1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1px; background: rgba(233,241,245,0.16); border: 1px solid rgba(233,241,245,0.16); margin-top: clamp(32px, 6vh, 64px);">
+      <a href="resources.dc.html" style="background: #08101C; padding: 30px 26px 40px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+        <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent, oklch(0.72 0.15 245));">Track 01</div>
+        <h3 style="font-size: 28px; letter-spacing: -0.02em; margin-top: 16px;">DSP foundations</h3>
+        <p style="font-size: 13.5px; font-weight: 300; line-height: 1.75; color: rgba(233,241,245,0.62); margin: 12px 0 0;">Six recorded sessions, slides and Python notebooks from sampling through the DFT.</p>
+      </a>
+      <a href="resources.dc.html" style="background: #08101C; padding: 30px 26px 40px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+        <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent, oklch(0.72 0.15 245));">Track 02</div>
+        <h3 style="font-size: 28px; letter-spacing: -0.02em; margin-top: 16px;">ML for signals</h3>
+        <p style="font-size: 13.5px; font-weight: 300; line-height: 1.75; color: rgba(233,241,245,0.62); margin: 12px 0 0;">Reading list, starter repos and the dataset index used in our study group.</p>
+      </a>
+      <a href="resources.dc.html" style="background: #08101C; padding: 30px 26px 40px; display: block; transition: background 0.25s;" style-hover="background: #0C1728;">
+        <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent, oklch(0.72 0.15 245));">Track 03</div>
+        <h3 style="font-size: 28px; letter-spacing: -0.02em; margin-top: 16px;">Lab &amp; hardware</h3>
+        <p style="font-size: 13.5px; font-weight: 300; line-height: 1.75; color: rgba(233,241,245,0.62); margin: 12px 0 0;">How to book the DSP kits, scope basics and a short SDR quick-start.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="team" style="border-top: 1px solid rgba(233,241,245,0.16); background: #0C1728;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: clamp(64px, 12vh, 150px) clamp(18px, 3.5vw, 52px);">
+      <div data-reveal="1" style="display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap;">
+        <div style="display: flex; gap: clamp(18px, 5vw, 84px); align-items: baseline; flex-wrap: wrap;">
+          <div style="font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">05 — Team</div>
+          <h2 style="font-size: clamp(28px, 4.4vw, 64px); letter-spacing: -0.035em; line-height: 1.05;">Committee 2026–27</h2>
+        </div>
+        <a href="team.dc.html" style="font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.62); border-bottom: 1px solid rgba(233,241,245,0.3); padding-bottom: 4px;" style-hover="color: #E9F1F5; border-color: #E9F1F5;">Full team</a>
+      </div>
+      <div data-reveal="1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: clamp(16px, 2vw, 28px); margin-top: clamp(32px, 6vh, 64px);">
+        <div>
+          <div style="aspect-ratio: 3 / 4; border: 1px solid rgba(233,241,245,0.14); background-image: repeating-linear-gradient(45deg, rgba(233,241,245,0.05) 0 1px, transparent 1px 10px);"></div>
+          <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; margin-top: 14px; letter-spacing: -0.01em;">Name Surname</div>
+          <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 6px;">Chair</div>
+        </div>
+        <div>
+          <div style="aspect-ratio: 3 / 4; border: 1px solid rgba(233,241,245,0.14); background-image: repeating-linear-gradient(45deg, rgba(233,241,245,0.05) 0 1px, transparent 1px 10px);"></div>
+          <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; margin-top: 14px; letter-spacing: -0.01em;">Name Surname</div>
+          <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 6px;">Vice chair</div>
+        </div>
+        <div>
+          <div style="aspect-ratio: 3 / 4; border: 1px solid rgba(233,241,245,0.14); background-image: repeating-linear-gradient(45deg, rgba(233,241,245,0.05) 0 1px, transparent 1px 10px);"></div>
+          <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; margin-top: 14px; letter-spacing: -0.01em;">Name Surname</div>
+          <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 6px;">Secretary</div>
+        </div>
+        <div>
+          <div style="aspect-ratio: 3 / 4; border: 1px solid rgba(233,241,245,0.14); background-image: repeating-linear-gradient(45deg, rgba(233,241,245,0.05) 0 1px, transparent 1px 10px);"></div>
+          <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; margin-top: 14px; letter-spacing: -0.01em;">Prof. Name Surname</div>
+          <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); margin-top: 6px;">Faculty advisor</div>
+        </div>
+      </div>
+      <div data-reveal="1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(50%, 160px), 1fr)); gap: 12px; margin-top: clamp(28px, 5vh, 56px);">
+        <div style="aspect-ratio: 4 / 3; border: 1px solid rgba(233,241,245,0.14); background-image: repeating-linear-gradient(45deg, rgba(233,241,245,0.05) 0 1px, transparent 1px 10px); display: flex; align-items: flex-end; padding: 12px;">
+          <span style="font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45);">SigHack 2025</span>
+        </div>
+        <div style="aspect-ratio: 4 / 3; border: 1px solid rgba(233,241,245,0.14); background-image: repeating-linear-gradient(45deg, rgba(233,241,245,0.05) 0 1px, transparent 1px 10px); display: flex; align-items: flex-end; padding: 12px;">
+          <span style="font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45);">SDR night</span>
+        </div>
+        <div style="aspect-ratio: 4 / 3; border: 1px solid rgba(233,241,245,0.14); background-image: repeating-linear-gradient(45deg, rgba(233,241,245,0.05) 0 1px, transparent 1px 10px); display: flex; align-items: flex-end; padding: 12px;">
+          <span style="font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Lecture</span>
+        </div>
+        <div style="aspect-ratio: 4 / 3; border: 1px solid rgba(233,241,245,0.14); background-image: repeating-linear-gradient(45deg, rgba(233,241,245,0.05) 0 1px, transparent 1px 10px); display: flex; align-items: flex-end; padding: 12px;">
+          <span style="font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Lab session</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="journal" style="border-top: 1px solid rgba(233,241,245,0.16); max-width: 1440px; margin: 0 auto; padding: clamp(64px, 12vh, 150px) clamp(18px, 3.5vw, 52px);">
+    <div data-reveal="1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(28px, 6vw, 88px);">
+      <div>
+        <div style="font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">06 — Blog</div>
+        <h2 style="font-size: clamp(28px, 4.4vw, 60px); letter-spacing: -0.035em; line-height: 1.05; margin-top: 18px; text-wrap: pretty;">Notes and a termly newsletter</h2>
+        <p style="font-size: 14px; font-weight: 300; line-height: 1.8; color: rgba(233,241,245,0.62); margin: 24px 0 0; max-width: 400px; text-wrap: pretty;">Members write up what they learn. One issue goes out at the end of each term with event recaps and reading picks.</p>
+        <form style="display: flex; gap: 10px; margin-top: 30px; flex-wrap: wrap; max-width: 420px;">
+          <input type="email" placeholder="you@college.edu" style="flex: 1 1 190px; min-width: 0; background: transparent; border: none; border-bottom: 1px solid rgba(233,241,245,0.3); padding: 12px 2px; font-family: 'Roboto Mono', monospace; font-size: 12px; color: #E9F1F5;">
+          <button type="button" style="background: #2FD39C; color: #06131F; border: none; border-radius: 999px; padding: 13px 24px; font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;" style-hover="background: var(--accent, oklch(0.68 0.15 245));">Subscribe</button>
+        </form>
+      </div>
+      <div style="border-top: 1px solid rgba(233,241,245,0.16);">
+        <a href="#" style="display: block; padding: 26px 4px; border-bottom: 1px solid rgba(233,241,245,0.16); transition: padding-left 0.25s;" style-hover="padding-left: 14px;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; color: rgba(233,241,245,0.45);">AUG 2026 · 6 MIN</div>
+          <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(20px, 2.2vw, 28px); letter-spacing: -0.02em; margin-top: 10px; line-height: 1.2;">Why window functions matter more than you think</div>
+        </a>
+        <a href="#" style="display: block; padding: 26px 4px; border-bottom: 1px solid rgba(233,241,245,0.16); transition: padding-left 0.25s;" style-hover="padding-left: 14px;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; color: rgba(233,241,245,0.45);">JUL 2026 · 4 MIN</div>
+          <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(20px, 2.2vw, 28px); letter-spacing: -0.02em; margin-top: 10px; line-height: 1.2;">Term recap: what the ECG team shipped</div>
+        </a>
+        <a href="#" style="display: block; padding: 26px 4px; border-bottom: 1px solid rgba(233,241,245,0.16); transition: padding-left 0.25s;" style-hover="padding-left: 14px;">
+          <div style="font-size: 10.5px; letter-spacing: 0.14em; color: rgba(233,241,245,0.45);">JUN 2026 · 8 MIN</div>
+          <div style="font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(20px, 2.2vw, 28px); letter-spacing: -0.02em; margin-top: 10px; line-height: 1.2;">A student's guide to reading an SPS paper</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-top: 1px solid rgba(233,241,245,0.16); max-width: 1440px; margin: 0 auto; padding: clamp(48px, 8vh, 88px) clamp(18px, 3.5vw, 52px);">
+    <div data-reveal="1" style="display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap;">
+      <div style="font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Supported by</div>
+      <a href="#join" style="font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.62); border-bottom: 1px solid rgba(233,241,245,0.3); padding-bottom: 4px;" style-hover="color: #E9F1F5; border-color: #E9F1F5;">Partner with us</a>
+    </div>
+    <div data-reveal="1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(50%, 150px), 1fr)); gap: 12px; margin-top: 32px;">
+      <div style="height: 84px; border: 1px solid rgba(233,241,245,0.14); display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Logo</div>
+      <div style="height: 84px; border: 1px solid rgba(233,241,245,0.14); display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Logo</div>
+      <div style="height: 84px; border: 1px solid rgba(233,241,245,0.14); display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Logo</div>
+      <div style="height: 84px; border: 1px solid rgba(233,241,245,0.14); display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Logo</div>
+    </div>
+  </section>
+
+  <section id="join" style="position: relative; background: #0F1A2B; color: #E9F1F5; overflow: hidden;">
+    <canvas ref="{{ footRef }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0.5;"></canvas>
+    <div style="position: relative; max-width: 1440px; margin: 0 auto; padding: clamp(72px, 14vh, 175px) clamp(18px, 3.5vw, 52px);">
+      <div style="font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent, oklch(0.75 0.14 245));">07 — Join</div>
+      <h2 style="font-size: clamp(34px, 7.5vw, 118px); line-height: 0.9; letter-spacing: -0.045em; margin-top: 22px; text-wrap: balance;">Open to every<br><span style="font-style: italic;">branch</span>.</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: clamp(24px, 4vw, 64px); margin-top: clamp(36px, 7vh, 72px); border-top: 1px solid rgba(233,241,245,0.2); padding-top: 28px;">
+        <p style="font-size: 14px; font-weight: 300; line-height: 1.8; color: rgba(233,241,245,0.72); margin: 0; max-width: 380px; text-wrap: pretty;">SPS student membership is $5 on top of IEEE student dues. Fill the form and an officer will get back within a week.</p>
+        <div style="font-size: 13px; line-height: 2; color: rgba(233,241,245,0.72);">
+          <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Contact</div>
+          <a href="#" style="color: #E9F1F5;" style-hover="color: var(--accent, oklch(0.75 0.14 245));">sps@yourcollege.edu</a><br>
+          <a href="#" style="color: #E9F1F5;" style-hover="color: var(--accent, oklch(0.75 0.14 245));">sponsor.sps@yourcollege.edu</a>
+        </div>
+        <div style="font-size: 13px; line-height: 2; color: rgba(233,241,245,0.72);">
+          <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(233,241,245,0.45);">Find us</div>
+          Room 214, Signal Processing Lab<br>Open hours: Wed &amp; Fri, 16:00–18:00
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start;">
+          <a href="#" style="background: #08101C; color: #E9F1F5; border-radius: 999px; padding: 15px 28px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;" style-hover="background: var(--accent, oklch(0.75 0.14 245));">Membership form</a>
+          <a href="#" style="color: rgba(233,241,245,0.72); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid rgba(233,241,245,0.3); padding-bottom: 3px;" style-hover="color: #E9F1F5;">Ask a question first</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background: #0F1A2B; color: rgba(233,241,245,0.55); border-top: 1px solid rgba(233,241,245,0.16);">
+    <div style="max-width: 1440px; margin: 0 auto; padding: 34px clamp(18px, 3.5vw, 52px); display: flex; gap: 20px; justify-content: space-between; flex-wrap: wrap; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;">
+      <span>IEEE SPS Student Chapter · VIT Vellore</span>
+      <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <a href="#" style="color: rgba(233,241,245,0.55);" style-hover="color: #E9F1F5;">Instagram</a>
+        <a href="#" style="color: rgba(233,241,245,0.55);" style-hover="color: #E9F1F5;">LinkedIn</a>
+        <a href="events.dc.html" style="color: rgba(233,241,245,0.55);" style-hover="color: #E9F1F5;">Events</a>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;oklch(0.68 0.15 245)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;oklch(0.68 0.15 245)&quot;,&quot;oklch(0.75 0.15 175)&quot;,&quot;oklch(0.78 0.16 155)&quot;,&quot;oklch(0.7 0.14 280)&quot;],&quot;section&quot;:&quot;Theme&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.wave = React.createRef();
+    this.foot = React.createRef();
+    this.header = React.createRef();
+    this.menuBtn = React.createRef();
+    this.mobileMenu = React.createRef();
+    this.progress = React.createRef();
+    this.pointer = { x: 0.5, y: 0.5 };
+    this.scrollBoost = 0;
+    this.menuOpen = false;
+  }
+
+  componentDidMount() {
+    this.onPointer = e => {
+      const w = window.innerWidth || 1, h = window.innerHeight || 1;
+      this.pointer = { x: e.clientX / w, y: e.clientY / h };
+    };
+    this.onScroll = () => {
+      const y = window.scrollY || 0;
+      this.scrollBoost = Math.min(1, Math.abs(y - (this.lastY || 0)) / 60);
+      this.lastY = y;
+
+      const headerEl = this.header.current;
+      if (headerEl) headerEl.classList.toggle("is-scrolled", y > 12);
+
+      const progressEl = this.progress.current;
+      if (progressEl) {
+        const doc = document.documentElement;
+        const max = (doc.scrollHeight || 1) - (doc.clientHeight || 1);
+        const pct = max > 0 ? Math.min(1, y / max) * 100 : 0;
+        progressEl.style.width = pct + "%";
+      }
+    };
+    window.addEventListener("pointermove", this.onPointer, { passive: true });
+    window.addEventListener("scroll", this.onScroll, { passive: true });
+    this.onScroll();
+
+    this.closeMenu = () => {
+      this.menuOpen = false;
+      if (this.menuBtn.current) {
+        this.menuBtn.current.classList.remove("is-open");
+        this.menuBtn.current.setAttribute("aria-expanded", "false");
+      }
+      if (this.mobileMenu.current) this.mobileMenu.current.classList.remove("is-open");
+    };
+    this.onMenuToggle = () => {
+      this.menuOpen = !this.menuOpen;
+      if (this.menuBtn.current) {
+        this.menuBtn.current.classList.toggle("is-open", this.menuOpen);
+        this.menuBtn.current.setAttribute("aria-expanded", String(this.menuOpen));
+      }
+      if (this.mobileMenu.current) this.mobileMenu.current.classList.toggle("is-open", this.menuOpen);
+    };
+    if (this.menuBtn.current) this.menuBtn.current.addEventListener("click", this.onMenuToggle);
+    if (this.mobileMenu.current) this.mobileMenu.current.addEventListener("click", e => { if (e.target.closest("a")) this.closeMenu(); });
+    this.onResize = () => { if (window.innerWidth > 760) this.closeMenu(); };
+    window.addEventListener("resize", this.onResize);
+
+    const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    this.reduced = reduced || this.props.motion === false;
+
+    const show = el => {
+      el.style.opacity = "1";
+      el.style.transform = "none";
+    };
+    this.io = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) { show(en.target); this.io.unobserve(en.target); } });
+    }, { threshold: 0, rootMargin: "0px 0px -6% 0px" });
+
+    const nodes = Array.prototype.slice.call(document.querySelectorAll("[data-reveal]"));
+    nodes.forEach((el, i) => {
+      if (this.reduced) { show(el); return; }
+      el.style.opacity = "0";
+      el.style.transform = "translateY(22px)";
+      el.style.transition = "opacity 0.9s cubic-bezier(0.22,1,0.36,1) " + (i % 3) * 0.06 + "s, transform 0.9s cubic-bezier(0.22,1,0.36,1) " + (i % 3) * 0.06 + "s";
+      this.io.observe(el);
+    });
+    // fail-open: if nothing scrolls or the observer never delivers, reveal everything
+    this.fallback = setTimeout(() => nodes.forEach(show), 1400);
+    this.onScrollShow = () => nodes.forEach(el => {
+      if (el.style.opacity === "0" && el.getBoundingClientRect().top < window.innerHeight * 0.94) show(el);
+    });
+    document.addEventListener("scroll", this.onScrollShow, true);
+
+    this.t0 = performance.now();
+    this.loop = () => {
+      const t = (performance.now() - this.t0) / 1000;
+      this.paint(this.wave.current, t, "hero");
+      this.paint(this.foot.current, t, "foot");
+      this.scrollBoost *= 0.94;
+      this.raf = requestAnimationFrame(this.loop);
+    };
+    this.raf = requestAnimationFrame(this.loop);
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.raf);
+    window.removeEventListener("pointermove", this.onPointer);
+    window.removeEventListener("scroll", this.onScroll);
+    window.removeEventListener("resize", this.onResize);
+    if (this.menuBtn.current) this.menuBtn.current.removeEventListener("click", this.onMenuToggle);
+    document.removeEventListener("scroll", this.onScrollShow, true);
+    clearTimeout(this.fallback);
+    if (this.io) this.io.disconnect();
+    document.querySelectorAll("[data-reveal]").forEach(el => {
+      el.style.opacity = "1";
+      el.style.transform = "none";
+    });
+  }
+
+  paint(cv, t, kind) {
+    if (!cv) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) return;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
+      cv.width = Math.round(w * dpr);
+      cv.height = Math.round(h * dpr);
+    }
+    const g = cv.getContext("2d");
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, w, h);
+
+    const accent = this.props.accent || "oklch(0.68 0.15 245)";
+    const ink = "rgba(233,241,245,";
+    const mid = kind === "foot" ? h * 0.55 : h * 0.52;
+    const px = this.pointer.x, py = this.pointer.y;
+    const boost = this.reduced ? 0 : this.scrollBoost;
+    const tt = this.reduced ? 0 : t;
+
+    const layers = [
+      { amp: h * (kind === "foot" ? 0.16 : 0.13), len: 620, spd: 0.28, col: accent, wdt: 1.4, alpha: 1 },
+      { amp: h * (kind === "foot" ? 0.11 : 0.085), len: 330, spd: -0.46, col: "rgba(47,211,156,0.6)", wdt: 1.1, alpha: 1 },
+      { amp: h * (kind === "foot" ? 0.07 : 0.05), len: 175, spd: 0.72, col: ink + "0.25)", wdt: 1, alpha: 1 }
+    ];
+
+    layers.forEach((L, li) => {
+      g.beginPath();
+      const ampMod = L.amp * (0.7 + py * 0.6 + boost * 0.9);
+      const phase = tt * L.spd * 2.2 + px * 3.4 + li * 1.1;
+      for (let x = 0; x <= w; x += 2) {
+        const env = Math.sin((x / w) * Math.PI) * 0.55 + 0.45;
+        const y = mid
+          + Math.sin(x / L.len * Math.PI * 2 + phase) * ampMod * env
+          + Math.sin(x / (L.len * 0.41) * Math.PI * 2 - phase * 1.7) * ampMod * 0.22 * env;
+        x === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
+      }
+      g.strokeStyle = L.col;
+      g.lineWidth = L.wdt;
+      g.stroke();
+    });
+
+    if (kind === "hero") {
+      g.strokeStyle = "rgba(233,241,245,0.09)";
+      g.lineWidth = 1;
+      for (let i = 1; i < 6; i++) {
+        const x = (w / 6) * i;
+        g.beginPath();
+        g.moveTo(x, 0);
+        g.lineTo(x, h);
+        g.stroke();
+      }
+    }
+  }
+
+  renderVals() {
+    return {
+      accent: this.props.accent ?? "oklch(0.68 0.15 245)",
+      waveRef: this.wave,
+      footRef: this.foot,
+      headerRef: this.header,
+      menuBtnRef: this.menuBtn,
+      mobileMenuRef: this.mobileMenu,
+      progressRef: this.progress
+    };
+  }
+}
+</script>
+</body>
+</html>
