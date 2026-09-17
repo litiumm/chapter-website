@@ -80,7 +80,6 @@
       <h1 style="font-size: clamp(58px, 15.5vw, 250px); line-height: 0.84; letter-spacing: -0.045em; margin: clamp(14px, 2.5vh, 28px) 0 0; text-wrap: balance;">Read the<br><span style="font-style: italic; color: #2FD39C;">signal</span>.</h1>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(20px, 4vw, 64px); align-items: end; margin-top: clamp(24px, 5vh, 56px); border-top: 1px solid rgba(233,241,245,0.16); padding-top: 22px;">
         <p style="font-size: 14.5px; font-weight: 300; line-height: 1.75; color: rgba(233,241,245,0.62); margin: 0; max-width: 420px; text-wrap: pretty;">Audio, images, radio, biosignals. A student chapter that takes them apart — weekly sessions, open material, working projects.</p>
-        <div style="font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,241,245,0.45); line-height: 2;">VIT Vellore<br>Dept. of Electronics &amp; Communication</div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start;">
           <a href="resources.dc.html" style="background: #2FD39C; color: #06131F; border-radius: 999px; padding: 14px 24px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;" style-hover="background: var(--accent, oklch(0.68 0.15 245));">Browse resources</a>
           <a href="#join" style="border: 1px solid rgba(233,241,245,0.28); border-radius: 999px; padding: 14px 24px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(233,241,245,0.62);" style-hover="border-color: #E9F1F5; color: #E9F1F5;">Join</a>
@@ -182,7 +181,7 @@
     </div>
   </section>
 
-  <section id="projects" style="border-top: 1px solid rgba(233,241,245,0.16); background: #0C1728;">
+  <section id="projects" style="display: none; border-top: 1px solid rgba(233,241,245,0.16); background: #0C1728;">
     <div style="max-width: 1440px; margin: 0 auto; padding: clamp(64px, 12vh, 150px) clamp(18px, 3.5vw, 52px);">
       <div data-reveal="1" style="display: flex; gap: clamp(18px, 5vw, 84px); align-items: baseline; flex-wrap: wrap;">
         <div style="font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233,241,245,0.45);">03 — Projects</div>
@@ -441,7 +440,7 @@ class Component extends DCLogic {
       this.menuOpen = !this.menuOpen;
       if (this.menuBtn.current) {
         this.menuBtn.current.classList.toggle("is-open", this.menuOpen);
-        this.menuBtn.current.setAttribute("aria-expanded", String(this.menuOpen));
+        this.menu Btn.current.setAttribute("aria-expanded", String(this.menuOpen));
       }
       if (this.mobileMenu.current) this.mobileMenu.current.classList.toggle("is-open", this.menuOpen);
     };
