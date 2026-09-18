@@ -21,7 +21,7 @@
   a:hover { color: rgba(233,241,245,0.62); }
 
   #site-header { transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease; border-bottom: 1px solid transparent; }
-  #site-header.is-scrolled { background: rgba(8,16,28,0.72); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); border-bottom-color: rgba(233,241,245,0.12); box-shadow: 0 16px 40px -26px rgba(0,0,0,0.7); }
+  #site-header.is-scrolled, #site-header.force-blur { background: rgba(8,16,28,0.72); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); border-bottom-color: rgba(233,241,245,0.12); box-shadow: 0 16px 40px -26px rgba(0,0,0,0.7); }
   .nav-link { position: relative; padding-bottom: 5px; }
   .nav-link::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1px; background: var(--accent, oklch(0.68 0.15 245)); transition: right 0.35s cubic-bezier(0.22,1,0.36,1); }
   .nav-link:hover::after { right: 0; }
@@ -188,6 +188,7 @@ class Component extends DCLogic {
         this.menuBtn.current.setAttribute("aria-expanded", "false");
       }
       if (this.mobileMenu.current) this.mobileMenu.current.classList.remove("is-open");
+      if (this.header.current) this.header.current.classList.remove("force-blur");
     };
     this.onMenuToggle = () => {
       this.menuOpen = !this.menuOpen;
@@ -196,6 +197,7 @@ class Component extends DCLogic {
         this.menuBtn.current.setAttribute("aria-expanded", String(this.menuOpen));
       }
       if (this.mobileMenu.current) this.mobileMenu.current.classList.toggle("is-open", this.menuOpen);
+      if (this.header.current) this.header.current.classList.toggle("force-blur", this.menuOpen);
     };
     if (this.menuBtn.current) this.menuBtn.current.addEventListener("click", this.onMenuToggle);
     if (this.mobileMenu.current) this.mobileMenu.current.addEventListener("click", e => { if (e.target.closest("a")) this.closeMenu(); });
