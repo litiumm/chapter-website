@@ -518,11 +518,9 @@ class Component extends DCLogic {
       const phase = tt * L.spd * 2.2 + px * 3.4 + li * 1.1;
       for (let x = 0; x <= w; x += 2) {
         const env = Math.sin((x / w) * Math.PI) * 0.55 + 0.45;
-        const noise = kind === "hero" ? (Math.random() - 0.5) * ampMod * 0.16 * env : 0;
         const y = mid
           + Math.sin(x / L.len * Math.PI * 2 + phase) * ampMod * env
-          + Math.sin(x / (L.len * 0.41) * Math.PI * 2 - phase * 1.7) * ampMod * 0.22 * env
-          + noise;
+          + Math.sin(x / (L.len * 0.41) * Math.PI * 2 - phase * 1.7) * ampMod * 0.22 * env;
         x === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
       }
       g.strokeStyle = L.col;
